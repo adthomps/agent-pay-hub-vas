@@ -21,13 +21,25 @@ This application consists of:
 
 ## Quick Start
 
-### 1. Installation
+### Option 1: GitHub Codespaces (Recommended)
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/adthomps/agent-pay-hub-vas)
+
+Click the button above to launch this project in a GitHub Codespace. The development environment will be automatically configured with:
+- Node.js and pnpm pre-installed
+- All dependencies installed
+- VS Code extensions configured
+- Port forwarding for development servers
+
+### Option 2: Local Development
+
+#### 1. Installation
 
 ```bash
-npm install
+pnpm install
 ```
 
-### 2. Configuration
+#### 2. Configuration
 
 Copy the example environment file and configure your credentials:
 
@@ -51,12 +63,12 @@ PORT=3001
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
-### 3. Running the Application
+#### 3. Running the Application
 
 Start both the server and frontend:
 
 ```bash
-npm run start:full
+pnpm run start:full
 ```
 
 This will start:
@@ -67,10 +79,10 @@ Alternatively, you can run them separately:
 
 ```bash
 # Terminal 1: Start the server
-npm run server:dev
+pnpm run server:dev
 
 # Terminal 2: Start the frontend
-npm run dev
+pnpm run dev
 ```
 
 ## Visa Acceptance Agent Toolkit Integration
@@ -132,12 +144,12 @@ This project is built with:
 
 ### Scripts
 
-- `npm run dev` - Start frontend development server
-- `npm run build` - Build frontend for production
-- `npm run server` - Start backend server
-- `npm run server:dev` - Start backend in development mode with auto-reload
-- `npm run start:full` - Start both frontend and backend concurrently
-- `npm run lint` - Run ESLint
+- `pnpm run dev` - Start frontend development server
+- `pnpm run build` - Build frontend for production
+- `pnpm run server` - Start backend server
+- `pnpm run server:dev` - Start backend in development mode with auto-reload
+- `pnpm run start:full` - Start both frontend and backend concurrently
+- `pnpm run lint` - Run ESLint
 
 ### Project Structure
 
@@ -192,7 +204,7 @@ When proper credentials are provided, the application will:
 
 2. **Server not starting**
    - Check that port 3001 is available
-   - Verify all dependencies are installed (`npm install`)
+   - Verify all dependencies are installed (`pnpm install`)
    - Check for any missing environment variables
 
 3. **Frontend can't connect to server**
@@ -216,7 +228,7 @@ Simply open [Lovable](https://lovable.dev/projects/973c464b-5038-41db-8524-66e11
 
 For production deployment, ensure you:
 1. Set production environment variables
-2. Build the frontend: `npm run build`
+2. Build the frontend: `pnpm run build`
 3. Configure your server to serve both the API and static files
 4. Set `VISA_ACCEPTANCE_ENVIRONMENT=PRODUCTION` for live operations
 
