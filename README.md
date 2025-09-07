@@ -123,6 +123,57 @@ You can also select specific tools from the dropdown:
 - Enter your natural language request
 - Click "Ask Agent" to execute
 
+### Mode Toggle Feature
+
+The application includes a **Mode Toggle** feature that allows you to manually switch between Demo and Live modes via the UI:
+
+#### Using the Mode Toggle
+
+1. **Location**: Look for the mode toggle in the header next to the theme toggle
+2. **Current Mode**: Shows "Demo" or "Live" with appropriate icons
+3. **Switching Modes**: Click the toggle to see available options
+
+#### Mode Types
+
+- **Demo Mode** 🧪
+  - Uses mock responses for all operations
+  - Perfect for testing the UI and understanding workflows
+  - Always available regardless of credential configuration
+  - Shows `"demo": true` in all API responses
+
+- **Live Mode** ⚡
+  - Connects to real Visa Acceptance APIs
+  - Only available when credentials are properly configured
+  - Shows `"demo": false` in all API responses
+  - Requires valid `VISA_ACCEPTANCE_*` environment variables
+
+#### Smart Mode Detection
+
+The system automatically:
+- Detects available credentials and toolkit status
+- Prevents switching to Live mode when credentials are missing
+- Shows clear indicators of why Live mode might not be available
+- Persists your mode preference in browser localStorage
+
+#### Mode Toggle API
+
+You can also control modes programmatically:
+
+```bash
+# Check current mode status
+curl http://localhost:3001/api/mode/status
+
+# Switch to demo mode
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"mode":"demo"}' \
+  http://localhost:3001/api/mode/toggle
+
+# Switch to live mode (requires valid credentials)
+curl -X POST -H "Content-Type: application/json" \
+  -d '{"mode":"live"}' \
+  http://localhost:3001/api/mode/toggle
+```
+
 ## API Endpoints
 
 The backend server provides these endpoints:
@@ -130,6 +181,8 @@ The backend server provides these endpoints:
 - `POST /api/agent/ask` - Process natural language queries
 - `GET /api/health` - Health check and toolkit status
 - `GET /api/agent/tools` - List available tools and capabilities
+- `GET /api/mode/status` - Get current mode status and capabilities
+- `POST /api/mode/toggle` - Switch between demo and live modes
 
 ## Technologies Used
 
