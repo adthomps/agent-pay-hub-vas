@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "server": "node server.js",
     "server:dev": "nodemon server.js",
-    "start:full": "concurrently \"npm run server:dev\" \"npm run dev\""
+    "start:full": "concurrently \"pnpm run server:dev\" \"pnpm run dev\""
   },
   "dependencies": {
     "@ai-sdk/openai": "^2.0.24",
