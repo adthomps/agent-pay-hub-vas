@@ -31,8 +31,13 @@ export function useAgent() {
       if (response.ok) {
         const result = await response.json();
         setLastResponse(result);
+        
+        // Show mode-aware toast
+        const isDemo = result.result?.demo === true;
+        const mode = isDemo ? "Demo" : "Live";
+        
         toast({
-          title: "Agent Response",
+          title: `${mode} Mode Response`,
           description: `Successfully executed ${result.tool}`,
         });
         return result;

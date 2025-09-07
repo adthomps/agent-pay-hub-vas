@@ -17,6 +17,9 @@ let visaToolkit = null;
 let visaTools = {};
 let toolkitError = null;
 
+// Mode toggle functionality - force demo mode even if credentials are available
+let forceDemoMode = false;
+
 async function initializeVisaToolkit() {
   const merchantId = process.env.VISA_ACCEPTANCE_MERCHANT_ID;
   const apiKeyId = process.env.VISA_ACCEPTANCE_API_KEY_ID;
@@ -154,8 +157,8 @@ app.post('/api/agent/ask', async (req, res) => {
       });
     }
 
-    // If Visa toolkit is available and loaded, use it
-    if (visaToolkit && Object.keys(visaTools).length > 0) {
+    // If Visa toolkit is available and loaded, and not in forced demo mode, use it
+    if (visaToolkit && Object.keys(visaTools).length > 0 && !forceDemoMode) {
       try {
         // Here we would use the actual AI SDK with the tools
         // For now, return a structured response showing the toolkit is loaded
@@ -195,11 +198,17 @@ app.post('/api/agent/ask', async (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
+  const canGoLive = !!(visaToolkit && Object.keys(visaTools).length > 0);
+  const isCurrentlyLive = canGoLive && !forceDemoMode;
+  
   res.json({
     status: 'ok',
     visaToolkitAvailable: !!visaToolkit,
     toolsAvailable: Object.keys(visaTools),
     toolkitError: toolkitError,
+    currentMode: isCurrentlyLive ? 'live' : 'demo',
+    forceDemoMode: forceDemoMode,
+    canGoLive: canGoLive,
     timestamp: new Date().toISOString(),
     environment: process.env.VISA_ACCEPTANCE_ENVIRONMENT || 'not-set',
     credentialsConfigured: !!(process.env.VISA_ACCEPTANCE_MERCHANT_ID && 
@@ -224,13 +233,71 @@ app.get('/api/agent/tools', (req, res) => {
   ];
 
   res.json({
-    tools: visaToolkit ? Object.keys(visaTools).map(key => ({
+    tools: (visaToolkit && !forceDemoMode) ? Object.keys(visaTools).map(key => ({
       id: key,
       name: key.replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase()),
       description: `Live Visa Acceptance API: ${key}`
     })) : mockTools,
-    isLive: !!visaToolkit,
-    toolkitStatus: visaToolkit ? 'operational' : 'demo-mode'
+    isLive: !!(visaToolkit && !forceDemoMode),
+    toolkitStatus: (visaToolkit && !forceDemoMode) ? 'operational' : 'demo-mode'
+  });
+});
+
+// Mode toggle endpoints
+app.get('/api/mode/status', (req, res) => {
+  const canGoLive = !!(visaToolkit && Object.keys(visaTools).length > 0);
+  const isCurrentlyLive = canGoLive && !forceDemoMode;
+  
+  res.json({
+    currentMode: isCurrentlyLive ? 'live' : 'demo',
+    forceDemoMode: forceDemoMode,
+    canGoLive: canGoLive,
+    toolkitAvailable: !!visaToolkit,
+    credentialsConfigured: !!(process.env.VISA_ACCEPTANCE_MERCHANT_ID && 
+                           process.env.VISA_ACCEPTANCE_API_KEY_ID && 
+                           process.env.VISA_ACCEPTANCE_SECRET_KEY),
+    timestamp: new Date().toISOString()
+  });
+});
+
+app.post('/api/mode/toggle', (req, res) => {
+  const { mode } = req.body;
+  
+  // Validate request
+  if (!mode || !['demo', 'live'].includes(mode)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Mode must be either "demo" or "live"'
+    });
+  }
+  
+  // Check if live mode is possible
+  const canGoLive = !!(visaToolkit && Object.keys(visaTools).length > 0);
+  
+  if (mode === 'live' && !canGoLive) {
+    return res.status(400).json({
+      success: false,
+      error: 'Cannot switch to live mode: Visa Acceptance toolkit not available or not properly configured',
+      details: {
+        toolkitAvailable: !!visaToolkit,
+        credentialsConfigured: !!(process.env.VISA_ACCEPTANCE_MERCHANT_ID && 
+                               process.env.VISA_ACCEPTANCE_API_KEY_ID && 
+                               process.env.VISA_ACCEPTANCE_SECRET_KEY)
+      }
+    });
+  }
+  
+  // Update mode
+  forceDemoMode = (mode === 'demo');
+  
+  const isCurrentlyLive = canGoLive && !forceDemoMode;
+  
+  res.json({
+    success: true,
+    previousMode: forceDemoMode ? 'live' : 'demo',
+    currentMode: isCurrentlyLive ? 'live' : 'demo',
+    message: `Successfully switched to ${isCurrentlyLive ? 'live' : 'demo'} mode`,
+    timestamp: new Date().toISOString()
   });
 });
 
