@@ -11,8 +11,14 @@ const TOOL_OPTIONS = [
   { value: "auto", label: "Auto (AI chooses)" },
   { value: "invoice.create", label: "Create Invoice" },
   { value: "invoice.list", label: "List Invoices" },
+  { value: "invoice.get", label: "Get Invoice" },
+  { value: "invoice.update", label: "Update Invoice" },
   { value: "invoice.send", label: "Send Invoice" },
-  { value: "link.create", label: "Create Pay Link" },
+  { value: "invoice.cancel", label: "Cancel Invoice" },
+  { value: "link.create", label: "Create Payment Link" },
+  { value: "link.list", label: "List Payment Links" },
+  { value: "link.get", label: "Get Payment Link" },
+  { value: "link.update", label: "Update Payment Link" },
 ];
 
 export function AgentBox() {
