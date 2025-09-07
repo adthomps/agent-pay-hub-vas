@@ -1,73 +1,233 @@
-# Welcome to your Lovable project
+# Visa Acceptance Agent Hub
 
-## Project info
+A React application integrated with the Visa Acceptance Agent Toolkit for AI-powered payment processing. This application demonstrates how to integrate Visa Acceptance APIs with Vercel's AI SDK for natural language processing of payment operations.
 
-**URL**: https://lovable.dev/projects/973c464b-5038-41db-8524-66e114acbb03
+![Integration Working](https://github.com/user-attachments/assets/6a23a332-0666-471b-b2cf-5fd828620d38)
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- 🤖 **AI Agent Assistant** - Natural language interface for payment operations
+- 💳 **Invoice Management** - Create, update, list, and manage invoices
+- 🔗 **Payment Links** - Generate and manage payment links
+- 🔧 **Visa Acceptance Integration** - Direct integration with Visa Acceptance APIs
+- 📊 **Real-time Dashboard** - View and manage all payment activities
 
-**Use Lovable**
+## Architecture
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/973c464b-5038-41db-8524-66e114acbb03) and start prompting.
+This application consists of:
+- **Frontend**: React + TypeScript + Vite application with shadcn/ui components
+- **Backend**: Express.js server with Visa Acceptance Agent Toolkit integration
+- **AI Integration**: Vercel AI SDK for natural language processing
 
-Changes made via Lovable will be committed automatically to this repo.
+## Quick Start
 
-**Use your preferred IDE**
+### 1. Installation
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+```bash
+npm install
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 2. Configuration
 
-Follow these steps:
+Copy the example environment file and configure your credentials:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+cp .env.example .env
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Edit `.env` with your Visa Acceptance credentials:
 
-# Step 3: Install the necessary dependencies.
-npm i
+```env
+# Visa Acceptance API Credentials
+VISA_ACCEPTANCE_MERCHANT_ID=your_merchant_id_here
+VISA_ACCEPTANCE_API_KEY_ID=your_api_key_id_here  
+VISA_ACCEPTANCE_SECRET_KEY=your_secret_key_here
+VISA_ACCEPTANCE_ENVIRONMENT=SANDBOX
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Server Configuration
+PORT=3001
+
+# Optional: For AI-powered responses
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+### 3. Running the Application
+
+Start both the server and frontend:
+
+```bash
+npm run start:full
+```
+
+This will start:
+- Backend server on http://localhost:3001
+- Frontend application on http://localhost:8080
+
+Alternatively, you can run them separately:
+
+```bash
+# Terminal 1: Start the server
+npm run server:dev
+
+# Terminal 2: Start the frontend
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Visa Acceptance Agent Toolkit Integration
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Supported Operations
 
-**Use GitHub Codespaces**
+The application integrates with the Visa Acceptance Agent Toolkit to provide:
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+#### Invoice Operations
+- **Create Invoice** - Create new invoices with customer information
+- **List Invoices** - Retrieve paginated list of invoices with filtering
+- **Get Invoice** - Retrieve detailed information for specific invoices
+- **Update Invoice** - Update existing invoice details
+- **Send Invoice** - Send invoices to customers via email
+- **Cancel Invoice** - Cancel existing invoices
 
-## What technologies are used for this project?
+#### Payment Link Operations
+- **Create Payment Link** - Create new payment links with optional shipping
+- **List Payment Links** - Retrieve paginated list of payment links
+- **Get Payment Link** - Retrieve details of specific payment links
+- **Update Payment Link** - Update existing payment link details
+
+### Usage Examples
+
+#### Using the AI Agent Assistant
+
+1. Navigate to the application at http://localhost:8080
+2. Use the "AI Agent Assistant" section at the top
+3. Enter natural language commands such as:
+   - "Create an invoice for $150 to alice@example.com for website design services"
+   - "List all pending invoices"
+   - "Create a payment link for $99.99 for premium subscription"
+
+#### Direct Tool Selection
+
+You can also select specific tools from the dropdown:
+- Choose a specific operation (e.g., "Create Invoice")
+- Enter your natural language request
+- Click "Ask Agent" to execute
+
+## API Endpoints
+
+The backend server provides these endpoints:
+
+- `POST /api/agent/ask` - Process natural language queries
+- `GET /api/health` - Health check and toolkit status
+- `GET /api/agent/tools` - List available tools and capabilities
+
+## Technologies Used
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Frontend**: Vite, TypeScript, React, shadcn-ui, Tailwind CSS
+- **Backend**: Express.js, Node.js
+- **Integration**: Visa Acceptance Agent Toolkit, Vercel AI SDK
+- **Development**: Concurrently, Nodemon, ts-node
 
-## How can I deploy this project?
+## Development
+
+### Scripts
+
+- `npm run dev` - Start frontend development server
+- `npm run build` - Build frontend for production
+- `npm run server` - Start backend server
+- `npm run server:dev` - Start backend in development mode with auto-reload
+- `npm run start:full` - Start both frontend and backend concurrently
+- `npm run lint` - Run ESLint
+
+### Project Structure
+
+```
+├── src/
+│   ├── components/        # React components
+│   ├── hooks/            # Custom React hooks
+│   ├── lib/              # Utility functions
+│   └── pages/            # Page components
+├── server.js             # Express server with Visa toolkit integration
+├── .env.example          # Environment variables template
+└── vite.config.ts        # Vite configuration with API proxy
+```
+
+## Configuration Details
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VISA_ACCEPTANCE_MERCHANT_ID` | Yes | Your Visa Acceptance merchant ID |
+| `VISA_ACCEPTANCE_API_KEY_ID` | Yes | Your Visa Acceptance API key ID |
+| `VISA_ACCEPTANCE_SECRET_KEY` | Yes | Your Visa Acceptance secret key |
+| `VISA_ACCEPTANCE_ENVIRONMENT` | No | `SANDBOX` or `PRODUCTION` (default: `SANDBOX`) |
+| `PORT` | No | Server port (default: `3001`) |
+| `OPENAI_API_KEY` | No | OpenAI API key for enhanced AI responses |
+
+### Demo Mode
+
+If the Visa Acceptance credentials are not configured, the application runs in demo mode with mock responses. This allows you to:
+- Test the user interface
+- Understand the workflow
+- See example responses
+- Prepare for live integration
+
+### Live Integration
+
+When proper credentials are provided, the application will:
+- Initialize the Visa Acceptance Agent Toolkit
+- Connect to the live Visa Acceptance APIs
+- Process real payment operations
+- Provide actual invoice and payment link functionality
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"Visa Acceptance Agent Toolkit not configured"**
+   - Check that all required environment variables are set
+   - Verify credentials are correct
+   - Ensure you're using the right environment (SANDBOX/PRODUCTION)
+
+2. **Server not starting**
+   - Check that port 3001 is available
+   - Verify all dependencies are installed (`npm install`)
+   - Check for any missing environment variables
+
+3. **Frontend can't connect to server**
+   - Ensure both frontend and server are running
+   - Check that the Vite proxy is configured correctly
+   - Verify the server is running on the expected port
+
+### Debug Information
+
+Check these endpoints for debugging:
+- http://localhost:3001/api/health - Server and toolkit status
+- http://localhost:3001/api/agent/tools - Available tools and capabilities
+
+## Deployment
+
+### Using Lovable
 
 Simply open [Lovable](https://lovable.dev/projects/973c464b-5038-41db-8524-66e114acbb03) and click on Share -> Publish.
 
-## Can I connect a custom domain to my Lovable project?
+### Manual Deployment
 
-Yes, you can!
+For production deployment, ensure you:
+1. Set production environment variables
+2. Build the frontend: `npm run build`
+3. Configure your server to serve both the API and static files
+4. Set `VISA_ACCEPTANCE_ENVIRONMENT=PRODUCTION` for live operations
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Contributing
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This application demonstrates the integration pattern for the Visa Acceptance Agent Toolkit. Feel free to extend it with:
+- Additional payment operations
+- Enhanced AI prompts
+- Custom business logic
+- Advanced error handling
+
+## License
+
+MIT License - see LICENSE file for details.
