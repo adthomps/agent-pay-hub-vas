@@ -218,20 +218,6 @@ Check these endpoints for debugging:
 - http://localhost:3001/api/health - Server and toolkit status
 - http://localhost:3001/api/agent/tools - Available tools and capabilities
 
-## Deployment
-
-### Using Lovable
-
-Simply open [Lovable](https://lovable.dev/projects/973c464b-5038-41db-8524-66e114acbb03) and click on Share -> Publish.
-
-### Manual Deployment
-
-For production deployment, ensure you:
-1. Set production environment variables
-2. Build the frontend: `pnpm run build`
-3. Configure your server to serve both the API and static files
-4. Set `VISA_ACCEPTANCE_ENVIRONMENT=PRODUCTION` for live operations
-
 ## Contributing
 
 This application demonstrates the integration pattern for the Visa Acceptance Agent Toolkit. Feel free to extend it with:
