@@ -3,6 +3,7 @@ import cors from 'cors';
 import * as dotenv from 'dotenv';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
+import { createRequire } from 'module';
 
 // Load environment variables
 dotenv.config();
@@ -57,8 +58,9 @@ async function initializeVisaToolkit(): Promise<void> {
   }
 
   try {
-    // Only try to import when we have all required credentials
-    const { VisaAcceptanceAgentToolkit } = await import('@visaacceptance/agent-toolkit/ai-sdk');
+    // Use createRequire to import the CommonJS version which works properly
+    const require = createRequire(import.meta.url);
+    const { VisaAcceptanceAgentToolkit } = require('@visaacceptance/agent-toolkit/ai-sdk');
     
     // Initialize the toolkit with the parameter-based constructor
     visaToolkit = new VisaAcceptanceAgentToolkit(
