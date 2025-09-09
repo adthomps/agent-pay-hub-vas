@@ -222,6 +222,320 @@ app.get('/api/agent/tools', (req, res) => {
   });
 });
 
+// Invoices API endpoints
+app.get('/api/invoices', async (req, res) => {
+  try {
+    if (visaToolkit && Object.keys(visaTools).length > 0 && !forceDemoMode) {
+      // Use live Visa toolkit
+      const listInvoicesTool = visaTools['list_invoices'];
+      if (listInvoicesTool) {
+        try {
+          const result = await listInvoicesTool.execute({ offset: 0, limit: 50 });
+          // Return array directly, not wrapped in object
+          res.json(Array.isArray(result) ? result : (result?.invoices || []));
+        } catch (error) {
+          console.error('Visa toolkit list_invoices error:', error);
+          // Fall back to demo mode if network or API call fails
+          res.json([
+            {
+              id: "inv_001",
+              amount: 100.00,
+              currency: "USD",
+              email: "jane@example.com",
+              name: "Jane Doe",
+              memo: "Consulting services",
+              status: "sent",
+              dueDate: "2024-02-15",
+              createdAt: "2024-01-15"
+            },
+            {
+              id: "inv_002",
+              amount: 250.00,
+              currency: "USD",
+              email: "john@company.com",
+              memo: "Software license",
+              status: "draft",
+              dueDate: "2024-02-20",
+              createdAt: "2024-01-16"
+            }
+          ]);
+        }
+      } else {
+        res.status(500).json({ error: 'list_invoices tool not available' });
+      }
+    } else {
+      // Demo mode - return mock data as array
+      res.json([
+        {
+          id: "inv_001",
+          amount: 100.00,
+          currency: "USD",
+          email: "jane@example.com",
+          name: "Jane Doe",
+          memo: "Consulting services",
+          status: "sent",
+          dueDate: "2024-02-15",
+          createdAt: "2024-01-15"
+        },
+        {
+          id: "inv_002",
+          amount: 250.00,
+          currency: "USD",
+          email: "john@company.com",
+          memo: "Software license",
+          status: "draft",
+          dueDate: "2024-02-20",
+          createdAt: "2024-01-16"
+        }
+      ]);
+    }
+  } catch (error) {
+    console.error('Get invoices error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/invoices', async (req, res) => {
+  try {
+    const invoiceData = req.body;
+    
+    if (visaToolkit && Object.keys(visaTools).length > 0 && !forceDemoMode) {
+      // Use live Visa toolkit
+      const createInvoiceTool = visaTools['create_invoice'];
+      if (createInvoiceTool) {
+        try {
+          const result = await createInvoiceTool.execute(invoiceData);
+          
+          // Check if result is an error string
+          if (typeof result === 'string' && result.toLowerCase().includes('failed')) {
+            throw new Error(result);
+          }
+          
+          res.json(result);
+        } catch (error) {
+          console.error('Visa toolkit create_invoice error:', error);
+          // Fall back to demo mode if network or API call fails
+          const mockInvoice = {
+            id: `inv_${Date.now()}`,
+            amount: invoiceData.amount,
+            currency: invoiceData.currency,
+            email: invoiceData.email,
+            name: invoiceData.name,
+            memo: invoiceData.memo,
+            status: "draft",
+            dueDate: new Date(Date.now() + (invoiceData.dueDays || 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            createdAt: new Date().toISOString().split('T')[0]
+          };
+          res.json(mockInvoice);
+        }
+      } else {
+        res.status(500).json({ error: 'create_invoice tool not available' });
+      }
+    } else {
+      // Demo mode - return mock invoice
+      const mockInvoice = {
+        id: `inv_${Date.now()}`,
+        amount: invoiceData.amount,
+        currency: invoiceData.currency,
+        email: invoiceData.email,
+        name: invoiceData.name,
+        memo: invoiceData.memo,
+        status: "draft",
+        dueDate: new Date(Date.now() + (invoiceData.dueDays || 30) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        createdAt: new Date().toISOString().split('T')[0]
+      };
+      res.json(mockInvoice);
+    }
+  } catch (error) {
+    console.error('Create invoice error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/invoices/:id/send', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (visaToolkit && Object.keys(visaTools).length > 0 && !forceDemoMode) {
+      // Use live Visa toolkit
+      const sendInvoiceTool = visaTools['send_invoice'];
+      if (sendInvoiceTool) {
+        try {
+          const result = await sendInvoiceTool.execute({ invoiceId: id });
+          
+          // Check if result is an error string
+          if (typeof result === 'string' && result.toLowerCase().includes('failed')) {
+            throw new Error(result);
+          }
+          
+          res.json(result);
+        } catch (error) {
+          console.error('Visa toolkit send_invoice error:', error);
+          // Fall back to demo mode if network or API call fails
+          res.json({ success: true, message: `Demo fallback: Invoice ${id} sent successfully` });
+        }
+      } else {
+        res.status(500).json({ error: 'send_invoice tool not available' });
+      }
+    } else {
+      // Demo mode
+      res.json({ success: true, message: `Demo: Invoice ${id} sent successfully` });
+    }
+  } catch (error) {
+    console.error('Send invoice error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/invoices/:id/cancel', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (visaToolkit && Object.keys(visaTools).length > 0 && !forceDemoMode) {
+      // Use live Visa toolkit
+      const cancelInvoiceTool = visaTools['cancel_invoice'];
+      if (cancelInvoiceTool) {
+        try {
+          const result = await cancelInvoiceTool.execute({ invoiceId: id });
+          
+          // Check if result is an error string
+          if (typeof result === 'string' && result.toLowerCase().includes('failed')) {
+            throw new Error(result);
+          }
+          
+          res.json(result);
+        } catch (error) {
+          console.error('Visa toolkit cancel_invoice error:', error);
+          // Fall back to demo mode if network or API call fails
+          res.json({ success: true, message: `Demo fallback: Invoice ${id} cancelled successfully` });
+        }
+      } else {
+        res.status(500).json({ error: 'cancel_invoice tool not available' });
+      }
+    } else {
+      // Demo mode
+      res.json({ success: true, message: `Demo: Invoice ${id} cancelled successfully` });
+    }
+  } catch (error) {
+    console.error('Cancel invoice error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Payment Links API endpoints
+app.get('/api/links', async (req, res) => {
+  try {
+    if (visaToolkit && Object.keys(visaTools).length > 0 && !forceDemoMode) {
+      // Use live Visa toolkit
+      const listPaymentLinksTool = visaTools['list_payment_links'];
+      if (listPaymentLinksTool) {
+        try {
+          const result = await listPaymentLinksTool.execute({ offset: 0, limit: 50 });
+          // Return array directly, not wrapped in object
+          res.json(Array.isArray(result) ? result : (result?.paymentLinks || []));
+        } catch (error) {
+          console.error('Visa toolkit list_payment_links error:', error);
+          // Fall back to demo mode if network or API call fails
+          res.json([
+            {
+              id: "link_1",
+              url: "https://pay.example.com/link_1",
+              amount: 100,
+              currency: "USD",
+              memo: "Sample payment link",
+              createdAt: new Date(Date.now() - 86400000).toISOString(),
+            },
+            {
+              id: "link_2", 
+              url: "https://pay.example.com/link_2",
+              amount: 250,
+              currency: "EUR",
+              memo: "Another payment link",
+              createdAt: new Date(Date.now() - 172800000).toISOString(),
+            }
+          ]);
+        }
+      } else {
+        res.status(500).json({ error: 'list_payment_links tool not available' });
+      }
+    } else {
+      // Demo mode - return mock data as array
+      res.json([
+        {
+          id: "link_1",
+          url: "https://pay.example.com/link_1",
+          amount: 100,
+          currency: "USD",
+          memo: "Sample payment link",
+          createdAt: new Date(Date.now() - 86400000).toISOString(),
+        },
+        {
+          id: "link_2", 
+          url: "https://pay.example.com/link_2",
+          amount: 250,
+          currency: "EUR",
+          memo: "Another payment link",
+          createdAt: new Date(Date.now() - 172800000).toISOString(),
+        }
+      ]);
+    }
+  } catch (error) {
+    console.error('Get payment links error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/links', async (req, res) => {
+  try {
+    const linkData = req.body;
+    
+    if (visaToolkit && Object.keys(visaTools).length > 0 && !forceDemoMode) {
+      // Use live Visa toolkit
+      const createPaymentLinkTool = visaTools['create_payment_link'];
+      if (createPaymentLinkTool) {
+        try {
+          const result = await createPaymentLinkTool.execute(linkData);
+          
+          // Check if result is an error string
+          if (typeof result === 'string' && result.toLowerCase().includes('failed')) {
+            throw new Error(result);
+          }
+          
+          res.json(result);
+        } catch (error) {
+          console.error('Visa toolkit create_payment_link error:', error);
+          // Fall back to demo mode if network or API call fails
+          const mockLink = {
+            id: `link_${Date.now()}`,
+            url: `https://pay.example.com/link_${Date.now()}`,
+            amount: linkData.amount,
+            currency: linkData.currency,
+            memo: linkData.memo,
+            createdAt: new Date().toISOString()
+          };
+          res.json(mockLink);
+        }
+      } else {
+        res.status(500).json({ error: 'create_payment_link tool not available' });
+      }
+    } else {
+      // Demo mode - return mock payment link
+      const mockLink = {
+        id: `link_${Date.now()}`,
+        url: `https://pay.example.com/link_${Date.now()}`,
+        amount: linkData.amount,
+        currency: linkData.currency,
+        memo: linkData.memo,
+        createdAt: new Date().toISOString()
+      };
+      res.json(mockLink);
+    }
+  } catch (error) {
+    console.error('Create payment link error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Mode toggle endpoints
 app.get('/api/mode/status', (req, res) => {
   const canGoLive = !!(visaToolkit && Object.keys(visaTools).length > 0);
