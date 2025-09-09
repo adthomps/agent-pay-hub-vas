@@ -211,6 +211,7 @@ app.get('/api/health', (req, res) => {
     canGoLive: canGoLive,
     timestamp: new Date().toISOString(),
     environment: process.env.VISA_ACCEPTANCE_ENVIRONMENT || 'not-set',
+    cybsEnvironment: process.env.CYBS_ENVIRONMENT || 'not-set',
     credentialsConfigured: !!(process.env.VISA_ACCEPTANCE_MERCHANT_ID && 
                            process.env.VISA_ACCEPTANCE_API_KEY_ID && 
                            process.env.VISA_ACCEPTANCE_SECRET_KEY)
@@ -317,13 +318,16 @@ async function startServer() {
       console.log('📝 Reason:', toolkitError);
     }
     
+    console.log('🏦 CyberSource Environment:', process.env.CYBS_ENVIRONMENT || 'not-set (defaults to SANDBOX when configured)');
+    
     if (!process.env.VISA_ACCEPTANCE_MERCHANT_ID) {
       console.log('\n🔑 To enable live Visa Acceptance features, set these environment variables:');
       console.log('   - VISA_ACCEPTANCE_MERCHANT_ID');
       console.log('   - VISA_ACCEPTANCE_API_KEY_ID');
       console.log('   - VISA_ACCEPTANCE_SECRET_KEY');
       console.log('   - VISA_ACCEPTANCE_ENVIRONMENT (SANDBOX or PRODUCTION)');
-      console.log('   - OPENAI_API_KEY (for AI-powered responses)\n');
+      console.log('   - OPENAI_API_KEY (for AI-powered responses)');
+      console.log('   - CYBS_ENVIRONMENT (SANDBOX or PRODUCTION)\n');
     }
   });
 }
