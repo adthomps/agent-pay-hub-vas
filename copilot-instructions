@@ -1,0 +1,54 @@
+# Copilot Instructions for AI Agents: agent-pay-hub-vas
+
+This guide enables AI coding agents to be productive in the Visa Acceptance Agent Hub codebase. It summarizes architectural patterns, developer workflows, conventions, and integration details unique to this project.
+
+---
+
+## 1. Big Picture Architecture
+
+- **Frontend:** React + TypeScript (Vite, shadcn/ui, Tailwind CSS). Key directories: `src/components/`, `src/pages/`, `src/hooks/`.
+- **Backend:** Express.js (`server.ts`/`server.js`), integrates the Visa Acceptance Agent Toolkit and exposes REST endpoints.
+- **AI Integration:** Uses Vercel AI SDK for natural language payment processing.
+- **Service Boundaries:** Frontend communicates with backend via `/api/*` endpoints. Backend routes include `/api/agent/ask`, `/api/agent/tools`, `/api/health`, `/api/mode/status`, `/api/mode/toggle`.
+- **Modes:** Supports "demo" (mocked) and "live" (real API) modes. Mode toggle is surfaced in the UI header (`ModeToggle` component).
+
+## 2. Developer Workflows
+
+- **Install Dependencies:** `pnpm install`
+- **Environment Configuration:** Copy `.env.example` to `.env` and set Visa credentials. Demo mode works without credentials; live mode requires:
+  - `VISA_ACCEPTANCE_MERCHANT_ID`
+  - `VISA_ACCEPTANCE_API_KEY_ID`
+  - `VISA_ACCEPTANCE_SECRET_KEY`
+  - `VISA_ACCEPTANCE_ENVIRONMENT` (`SANDBOX` or `PRODUCTION`)
+  - `OPENAI_API_KEY` (optional, for enhanced AI responses)
+- **Start Servers:** 
+  - Concurrently: `pnpm run start:full` (backend on port 3001, frontend on 8080)
+  - Individually: `pnpm run server:dev` and `pnpm run dev`
+- **Lint/Build:** `pnpm run lint` and `pnpm run build` for frontend.
+- **Troubleshooting:** Use `/api/health` and `/api/agent/tools` endpoints for live status and debugging.
+
+## 3. Project-Specific Patterns & Conventions
+
+- **Mode Toggle:** Clicking the mode toggle (UI header) switches between demo (mocked responses) and live (real Visa APIs) operation. All API responses include `"demo": true|false`.
+- **Agent Operations:** Supported tools include `invoice.create`, `invoice.list`, `invoice.get`, `invoice.update`, `invoice.send`, `invoice.cancel`, `paymentLinks.create`, `paymentLinks.list`, etc. See `server.ts` and `src/components/AgentBox.tsx` for how tool selection and agent queries are handled.
+- **Design Tokens:** All colors and gradients must be HSL, defined in `src/index.css`.
+- **TypeScript Models:** Key types/interfaces for invoices and payment links are in `src/hooks/useInvoices.ts` and similar hooks.
+
+## 4. Integration Points
+
+- **Visa Acceptance Agent Toolkit:** Initialized in backend (`server.ts`/`server.js`). Fails gracefully to demo mode if credentials are missing.
+- **AI SDK:** Used for natural language processing. See backend agent endpoint (`/api/agent/ask`) for invocation logic.
+- **Frontend/Backend Communication:** API endpoints are proxied by Vite (`vite.config.ts`) for local development.
+- **GitHub Codespaces:** Fully supported; see `.devcontainer/README.md` for optimized VS Code extensions, auto-formatting, and port forwarding.
+
+## 5. Examples
+
+- **AgentBox Usage:** Users type natural language requests (e.g., "Create invoice for $100 to jane@example.com"). Optionally, a tool can be selected from a dropdown.
+- **Mock vs Live Responses:** Demo mode returns mock data; live mode hits Visa APIs.
+- **Component Structure:** See `src/pages/Index.tsx` for layout; forms and tables are organized into left/right columns.
+
+## 6. Debugging & Extensibility
+
+- **Debug endpoints:** Use `/api/health` and `/api/agent/tools` for status.
+- **Extend agent operations:** Add new tools in backend and expose them in frontend dropdowns.
+- **Custom business logic:** Implement in Express server or React hooks as needed.
