@@ -37,54 +37,30 @@ async function initializeVisaToolkit() {
     const require = createRequire(import.meta.url);
     const { VisaAcceptanceAgentToolkit } = require('@visaacceptance/agent-toolkit/ai-sdk');
     
-    // Initialize the toolkit - trying different constructor patterns
-    try {
-      // Try the object-based constructor first (as shown in documentation)
-      visaToolkit = new VisaAcceptanceAgentToolkit({
-        merchantId,
-        apiKeyId,
-        secretKey,
-        configuration: {
-          actions: {
-            invoices: {
-              create: true,
-              update: true,
-              list: true,
-              get: true,
-            },
-            paymentLinks: {
-              create: true,
-              update: true,
-              list: true,
-            },
+    // Initialize the toolkit with parameter-based constructor (object-based doesn't work properly)
+    visaToolkit = new VisaAcceptanceAgentToolkit(
+      merchantId,
+      apiKeyId,
+      secretKey,
+      process.env.VISA_ACCEPTANCE_ENVIRONMENT || 'SANDBOX',
+      {
+        actions: {
+          invoices: {
+            create: true,
+            update: true,
+            list: true,
+            get: true,
+            read: true,
+          },
+          paymentLinks: {
+            create: true,
+            update: true,
+            list: true,
+            read: true,
           },
         },
-      });
-    } catch (objectError) {
-      console.log('Object-based constructor failed, trying parameter-based constructor...');
-      // Try the parameter-based constructor (as shown in TypeScript definitions)
-      visaToolkit = new VisaAcceptanceAgentToolkit(
-        merchantId,
-        apiKeyId,
-        secretKey,
-        process.env.VISA_ACCEPTANCE_ENVIRONMENT || 'SANDBOX',
-        {
-          actions: {
-            invoices: {
-              create: true,
-              update: true,
-              list: true,
-              get: true,
-            },
-            paymentLinks: {
-              create: true,
-              update: true,
-              list: true,
-            },
-          },
-        }
-      );
-    }
+      }
+    );
     
     visaTools = visaToolkit.getTools();
     console.log('✅ Visa Acceptance Agent Toolkit initialized successfully');
